@@ -141,7 +141,7 @@ interface ManagerInterface extends CheckAccessInterface
      * @param $allow
      * @return bool whether the child successfully added
      */
-    public function addChild($parent, $child, $allow);
+    public function addChild($parent, $child, $allow = true);
 
     /**
      * Removes a child from its parent.
