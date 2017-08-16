@@ -1,0 +1,49 @@
+{
+  "name": "ait/rbac",
+  "description": "AIT RBAC",
+  "keywords": [
+    "ait",
+    "yii",
+    "yii2",
+    "yii 2",
+    "rbac"
+  ],
+  "type": "yii2-extension",
+  "license": "BSD-3-Clause",
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.6.0",
+    "yiisoft/yii2": ">=2.0.11"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "ait\\rbac\\": ""
+    }
+  },
+  "config": {
+    "fxp-asset": {
+      "installer-paths": {
+        "npm-asset-library": "vendor/npm",
+        "bower-asset-library": "vendor/bower"
+      }
+    }
+  },
+  "extra": {
+    "yii\\composer\\Installer::postInstall": {
+      "copyFiles": [
+        {
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "post-update-cmd": [
+      "yii\\composer\\Installer::postInstall"
+    ],
+    "post-install-cmd": [
+      "yii\\composer\\Installer::postInstall"
+    ]
+  }
+}
