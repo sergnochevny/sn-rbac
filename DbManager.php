@@ -260,7 +260,7 @@ class DbManager extends BaseManager
         ]);
         $permissions = [];
         foreach ($query->each(100, $this->db) as $row) {
-            $row['allow'] = $result[$row['name']]['allow'];
+            $row['allow'] = $result[$row['name']];
             $permissions[$row['name']] = $this->populateItem($row);
         }
         return $permissions;
@@ -293,7 +293,7 @@ class DbManager extends BaseManager
             foreach ($childrenList[$name] as $item) {
                 list($child, $allow) = $item;
                 $result[$child] = isset($result[$child]) ? $result[$child] : (isset($allow) ? $allow : true);
-                $this->getChildrenRecursive($item['child'], $childrenList, $result);
+                $this->getChildrenRecursive($child, $childrenList, $result);
             }
         }
     }
