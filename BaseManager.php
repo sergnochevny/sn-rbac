@@ -10,6 +10,7 @@ use yii\base\InvalidConfigException;
 use yii\base\InvalidParamException;
 use yii\helpers\ArrayHelper;
 use yii\rbac\Assignment;
+use yii\rbac\ManagerInterface;
 
 /**
  * BaseManager is a base class implementing [[ManagerInterface]] for RBAC management.

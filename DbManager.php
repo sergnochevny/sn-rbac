@@ -678,7 +678,7 @@ class DbManager extends BaseManager
         }
 
         $this->db->createCommand()
-            ->insert($this->itemChildTable, ['parent' => $parent->name, 'child' => $child->name, 'allow' => $allow])
+            ->insert($this->itemChildTable, ['parent' => $parent->name, 'child' => $child->name, 'allow' => $child->allow])
             ->execute();
 
         $this->invalidateCache();
