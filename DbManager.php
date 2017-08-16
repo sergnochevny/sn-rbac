@@ -291,7 +291,8 @@ class DbManager extends BaseManager
     {
         if (isset($childrenList[$name])) {
             foreach ($childrenList[$name] as $item) {
-                $result[$item['child']] = isset($result[$item['child']]) ? $result[$item['child']] : (isset($item['allow']) ? $item['allow'] : true);
+                list($child, $allow) = $item;
+                $result[$child] = isset($result[$child]) ? $result[$child] : (isset($allow) ? $allow : true);
                 $this->getChildrenRecursive($item['child'], $childrenList, $result);
             }
         }
