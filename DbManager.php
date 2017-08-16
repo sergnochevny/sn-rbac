@@ -162,8 +162,7 @@ class DbManager extends BaseManager
         }
         if (!empty($this->parents[$itemName])) {
             foreach ($this->parents[$itemName] as $item) {
-                list($parent, $allow) = $item;
-                $params['allow'] = $allow;
+                list($parent, $params['allow']) = array_values($item);
                 if ($this->checkAccessFromCache($user, $parent, $params, $assignments)) {
                     return true;
                 }
@@ -223,8 +222,7 @@ class DbManager extends BaseManager
             ->from($this->itemChildTable)
             ->where(['child' => $itemName]);
         foreach ($parents->each(100, $this->db) as $item) {
-            list($parent, $allow) = $item;
-            $params['allow'] = $allow;
+            list($parent, $params['allow']) = array_values($item);
             if ($this->checkAccessRecursive($user, $parent, $params, $assignments)) {
                 return true;
             }
