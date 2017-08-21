@@ -225,6 +225,8 @@ class DbManager extends BaseManager
             list($parent, $params['allow']) = array_values($item);
             if ($this->checkAccessRecursive($user, $parent, $params, $assignments)) {
                 return true;
+            } elseif (isset($params['allow'])) {
+                break;
             }
         }
 
@@ -679,7 +681,8 @@ class DbManager extends BaseManager
         }
 
         $this->db->createCommand()
-            ->insert($this->itemChildTable, ['parent' => $parent->name, 'child' => $child->name, 'allow' => $child->allow])
+            ->insert($this->itemChildTable,
+                ['parent' => $parent->name, 'child' => $child->name, 'allow' => $child->allow])
             ->execute();
 
         $this->invalidateCache();
