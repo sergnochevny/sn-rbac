@@ -149,27 +149,28 @@ class DbManager extends BaseManager
     protected function checkAccessFromCache($user, $itemName, $params, $assignments)
     {
         if (!isset($this->items[$itemName])) {
-            return false;
+            return [false, false];
         }
         $item = $this->items[$itemName];
         Yii::trace(($item instanceof Role) || ($item instanceof CustomRole) ? "Checking role: $itemName" : "Checking permission: $itemName",
             __METHOD__);
         if (!$this->executeRule($user, $item, $params)) {
-            return false;
+            return [false, true];
         }
         if (isset($assignments[$itemName]) || in_array($itemName, $this->defaultRoles)) {
-            return isset($params['allow']) ? $params['allow'] : true;
+            return [isset($params['allow']) ? $params['allow'] : true, true];
         }
         if (!empty($this->parents[$itemName])) {
             foreach ($this->parents[$itemName] as $item) {
                 list($parent, $params['allow']) = array_values($item);
-                if ($this->checkAccessFromCache($user, $parent, $params, $assignments)) {
-                    return true;
+                list($access, $assign) = $this->checkAccessFromCache($user, $parent, $params, $assignments);
+                if ($assign) {
+                    return [$access, $assign];
                 }
             }
         }
 
-        return false;
+        return [false, false];
     }
 
     /**
@@ -207,15 +208,15 @@ class DbManager extends BaseManager
     protected function checkAccessRecursive($user, $itemName, $params, $assignments)
     {
         if (($item = $this->getItem($itemName)) === null) {
-            return false;
+            return [false, false];
         }
         Yii::trace(($item instanceof Role) || ($item instanceof CustomRole) ? "Checking role: $itemName" : "Checking permission: $itemName",
             __METHOD__);
         if (!$this->executeRule($user, $item, $params)) {
-            return false;
+            return [false, true];
         }
         if (isset($assignments[$itemName]) || in_array($itemName, $this->defaultRoles)) {
-            return isset($params['allow']) ? $params['allow'] : true;
+            return [isset($params['allow']) ? $params['allow'] : true, true];
         }
         $query = new Query();
         $parents = $query->select(['parent', 'allow'])
@@ -223,14 +224,13 @@ class DbManager extends BaseManager
             ->where(['child' => $itemName]);
         foreach ($parents->each(100, $this->db) as $item) {
             list($parent, $params['allow']) = array_values($item);
-            if ($this->checkAccessRecursive($user, $parent, $params, $assignments)) {
-                return true;
-            } elseif (isset($params['allow'])) {
-                break;
+            list($access, $assign) = $this->checkAccessRecursive($user, $parent, $params, $assignments);
+            if ($assign) {
+                return [$access, $assign];
             }
         }
 
-        return false;
+        return [false, false];
     }
 
 
@@ -582,10 +582,11 @@ class DbManager extends BaseManager
         }
         $this->loadFromCache();
         if ($this->items !== null) {
-            return $this->checkAccessFromCache($userId, $permissionName, $params, $assignments);
+            list($access, $assign) = $this->checkAccessFromCache($userId, $permissionName, $params, $assignments);
+        } else {
+            list($access, $assign) = $this->checkAccessRecursive($userId, $permissionName, $params, $assignments);
         }
-
-        return $this->checkAccessRecursive($userId, $permissionName, $params, $assignments);
+        return $access && $assign;
     }
 
     /**
