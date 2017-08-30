@@ -272,6 +272,6 @@ abstract class BaseManager extends Component implements ManagerInterface
      */
     protected function hasNoAssignments(array $assignments)
     {
-        return empty($assignments) && empty($this->defaultRoles);
+        return empty($assignments);
     }
 }

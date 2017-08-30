@@ -146,24 +146,20 @@ class DbManager extends BaseManager
      * @return bool whether the operations can be performed by the user.
      * @since 2.0.3
      */
-    protected function checkAccessFromCache($user, $itemName, $params, $assignments)
+    protected function checkAccessFromCache($user, $item, $params, $assignments)
     {
-        if (!isset($this->items[$itemName])) {
-            return [false, false];
+        if (isset($assignments[$item->name])) {
+            if (!$this->executeRule($user, $item, $params)) {
+                return [false, true];
+            }
+            return [$assignments[$item->name], true];
         }
-        $item = $this->items[$itemName];
-        Yii::trace(($item instanceof Role) || ($item instanceof CustomRole) ? "Checking role: $itemName" : "Checking permission: $itemName",
-            __METHOD__);
-        if (!$this->executeRule($user, $item, $params)) {
-            return [false, true];
-        }
-        if (isset($assignments[$itemName]) || in_array($itemName, $this->defaultRoles)) {
-            return [isset($params['allow']) ? $params['allow'] : true, true];
-        }
-        if (!empty($this->parents[$itemName])) {
-            foreach ($this->parents[$itemName] as $item) {
-                list($parent, $params['allow']) = array_values($item);
-                list($access, $assign) = $this->checkAccessFromCache($user, $parent, $params, $assignments);
+
+        foreach ($assignments as $assignment => $allow) {
+            if (!empty($this->parents[$assignment])) {
+                $params['allow'] = (bool)$allow;
+                $_assignments = $this->parents[$assignment];
+                list($access, $assign) = $this->checkAccessFromCache($user, $item, $params, $_assignments);
                 if ($assign) {
                     return [$access, $assign];
                 }
@@ -205,31 +201,30 @@ class DbManager extends BaseManager
      * @param Assignment[] $assignments the assignments to the specified user
      * @return array
      */
-    protected function checkAccessRecursive($user, $itemName, $params, $assignments)
+    protected function checkAccessRecursive($user, $item, $params, $assignments)
     {
-        if (($item = $this->getItem($itemName)) === null) {
-            return [false, false];
-        }
-        Yii::trace(($item instanceof Role) || ($item instanceof CustomRole) ? "Checking role: $itemName" : "Checking permission: $itemName",
-            __METHOD__);
-        if (!$this->executeRule($user, $item, $params)) {
-            return [false, true];
-        }
-        if (isset($assignments[$itemName]) || in_array($itemName, $this->defaultRoles)) {
-            return [isset($params['allow']) ? (bool) $params['allow'] : true, true];
-        }
-        $query = new Query();
-        $parents = $query->select(['parent', 'allow'])
-            ->from($this->itemChildTable)
-            ->where(['child' => $itemName]);
-        foreach ($parents->each(100, $this->db) as $item) {
-            list($parent, $params['allow']) = array_values($item);
-            list($access, $assign) = $this->checkAccessRecursive($user, $parent, $params, $assignments);
-            if ($assign) {
-                return [$access, $assign];
+        if (isset($assignments[$item->name])) {
+            if (!$this->executeRule($user, $item, $params)) {
+                return [false, true];
             }
+            return [$assignments[$item->name], true];
         }
 
+        foreach ($assignments as $assignment => $allow) {
+            if (($assignment = $this->getItem($assignment)) !== null) {
+                $query = new Query();
+                $children = $query->select(['child', 'allow'])
+                    ->from($this->itemChildTable)
+                    ->where(['parent' => $assignment->name])
+                    ->all($this->db);
+                $params['allow'] = (bool)$allow;
+                $_assignments = ArrayHelper::map($children, 'child', 'allow');
+                list($access, $assign) = $this->checkAccessRecursive($user, $item, $params, $_assignments);
+                if ($assign) {
+                    return [$access, $assign];
+                }
+            }
+        }
         return [false, false];
     }
 
@@ -582,11 +577,22 @@ class DbManager extends BaseManager
         }
         $this->loadFromCache();
         if ($this->items !== null) {
-            list($access, $assign) = $this->checkAccessFromCache($userId, $permissionName, $params, $assignments);
+            if (!isset($this->items[$permissionName])) {
+                return false;
+            }
+            $item = $this->items[$permissionName];
+            Yii::trace(($item instanceof Role) || ($item instanceof CustomRole) ? "Checking role: $permissionName" : "Checking permission: $permissionName",
+                __METHOD__);
+            list($access, $assign) = $this->checkAccessFromCache($userId, $item, $params, $assignments);
         } else {
-            list($access, $assign) = $this->checkAccessRecursive($userId, $permissionName, $params, $assignments);
+            if (($item = $this->getItem($permissionName)) === null) {
+                return false;
+            }
+            Yii::trace(($item instanceof Role) || ($item instanceof CustomRole) ? "Checking role: $permissionName" : "Checking permission: $permissionName",
+                __METHOD__);
+            list($access, $assign) = $this->checkAccessRecursive($userId, $item, $params, $assignments);
         }
-        return $access && $assign;
+        return !empty($access) && !empty($assign);
     }
 
     /**
@@ -725,8 +731,8 @@ class DbManager extends BaseManager
         $query = (new Query())->from($this->itemChildTable);
         $this->parents = [];
         foreach ($query->all($this->db) as $row) {
-            if (isset($this->items[$row['child']])) {
-                $this->parents[$row['child']][] = [$row['parent'], $row['allow']];
+            if (isset($this->items[$row['child']], $this->items[$row['child']])) {
+                $this->parents[$row['parent']][$row['child']] = $row['allow'];
             }
         }
 
@@ -818,7 +824,15 @@ class DbManager extends BaseManager
     public function getAssignments($userId)
     {
         if ($this->isEmptyUserId($userId)) {
-            return [];
+            $assignments = [];
+            if (!empty($this->defaultRoles)) {
+                foreach ($this->defaultRoles as $defaultRole) {
+                    if (($item = $this->getItem($defaultRole)) !== null) {
+                        $assignments[$defaultRole] = true;
+                    }
+                }
+            }
+            return $assignments;
         }
 
         $query = (new Query())
@@ -827,11 +841,7 @@ class DbManager extends BaseManager
 
         $assignments = [];
         foreach ($query->all($this->db) as $row) {
-            $assignments[$row['item_name']] = new Assignment([
-                'userId' => $row['user_id'],
-                'roleName' => $row['item_name'],
-                'createdAt' => $row['created_at'],
-            ]);
+            $assignments[$row['item_name']] = true;
         }
 
         return $assignments;
