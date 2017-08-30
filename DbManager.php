@@ -203,7 +203,7 @@ class DbManager extends BaseManager
      * with the tasks and roles assigned to the user. A param with name 'user' is added to this array,
      * which holds the value of `$userId`.
      * @param Assignment[] $assignments the assignments to the specified user
-     * @return bool whether the operations can be performed by the user.
+     * @return array
      */
     protected function checkAccessRecursive($user, $itemName, $params, $assignments)
     {
@@ -216,7 +216,7 @@ class DbManager extends BaseManager
             return [false, true];
         }
         if (isset($assignments[$itemName]) || in_array($itemName, $this->defaultRoles)) {
-            return [isset($params['allow']) ? $params['allow'] : true, true];
+            return [isset($params['allow']) ? (bool) $params['allow'] : true, true];
         }
         $query = new Query();
         $parents = $query->select(['parent', 'allow'])
