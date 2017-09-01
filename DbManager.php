@@ -581,15 +581,23 @@ class DbManager extends BaseManager
                 return false;
             }
             $item = $this->items[$permissionName];
-            Yii::trace(($item instanceof Role) || ($item instanceof CustomRole) ? "Checking role: $permissionName" : "Checking permission: $permissionName",
-                __METHOD__);
+            Yii::trace(
+                ($item instanceof Role) || ($item instanceof CustomRole)
+                    ? "Checking role: $permissionName"
+                    : "Checking permission: $permissionName",
+                __METHOD__
+            );
             list($access, $assign) = $this->checkAccessFromCache($userId, $item, $params, $assignments);
         } else {
             if (($item = $this->getItem($permissionName)) === null) {
                 return false;
             }
-            Yii::trace(($item instanceof Role) || ($item instanceof CustomRole) ? "Checking role: $permissionName" : "Checking permission: $permissionName",
-                __METHOD__);
+            Yii::trace(
+                ($item instanceof Role) || ($item instanceof CustomRole)
+                    ? "Checking role: $permissionName"
+                    : "Checking permission: $permissionName",
+                __METHOD__
+            );
             list($access, $assign) = $this->checkAccessRecursive($userId, $item, $params, $assignments);
         }
         return !empty($access) && !empty($assign);
@@ -688,8 +696,10 @@ class DbManager extends BaseManager
         }
 
         $this->db->createCommand()
-            ->insert($this->itemChildTable,
-                ['parent' => $parent->name, 'child' => $child->name, 'allow' => $child->allow])
+            ->insert(
+                $this->itemChildTable,
+                ['parent' => $parent->name, 'child' => $child->name, 'allow' => $child->allow]
+            )
             ->execute();
 
         $this->invalidateCache();
@@ -1007,6 +1017,9 @@ class DbManager extends BaseManager
         $this->db->createCommand()->delete($this->assignmentTable)->execute();
     }
 
+    /**
+     *
+     */
     public function invalidateCache()
     {
         if ($this->cache !== null) {
@@ -1034,5 +1047,4 @@ class DbManager extends BaseManager
             ->from($this->assignmentTable)
             ->where(['item_name' => $roleName])->column($this->db);
     }
-
 }
