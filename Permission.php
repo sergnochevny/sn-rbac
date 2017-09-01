@@ -5,6 +5,10 @@
 
 namespace ait\rbac;
 
+/**
+ * Class Permission
+ * @package ait\rbac
+ */
 class Permission extends Item
 {
     /**

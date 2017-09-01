@@ -5,6 +5,10 @@
 
 namespace ait\rbac;
 
+/**
+ * Class Role
+ * @package ait\rbac
+ */
 class Role extends Item
 {
     /**
