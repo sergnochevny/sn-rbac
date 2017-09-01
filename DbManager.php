@@ -16,7 +16,6 @@ use yii\db\Query;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 use yii\rbac\Assignment;
-use yii\rbac\Rule;
 
 /**
  * DbManager represents an authorization manager that stores authorization information in database.
@@ -138,12 +137,12 @@ class DbManager extends BaseManager
      * This method is internally called by [[checkAccess()]] when [[cache]] is enabled.
      * @param string|int $user the user ID. This should can be either an integer or a string representing
      * the unique identifier of a user. See [[\yii\web\User::id]].
-     * @param string $itemName the name of the operation that need access check
+     * @param Item $item
      * @param array $params name-value pairs that would be passed to rules associated
      * with the tasks and roles assigned to the user. A param with name 'user' is added to this array,
      * which holds the value of `$userId`.
      * @param Assignment[] $assignments the assignments to the specified user
-     * @return bool whether the operations can be performed by the user.
+     * @return array
      * @since 2.0.3
      */
     protected function checkAccessFromCache($user, $item, $params, $assignments)
@@ -194,12 +193,13 @@ class DbManager extends BaseManager
      * This method is internally called by [[checkAccess()]].
      * @param string|int $user the user ID. This should can be either an integer or a string representing
      * the unique identifier of a user. See [[\yii\web\User::id]].
-     * @param string $itemName the name of the operation that need access check
+     * @param Item $item
      * @param array $params name-value pairs that would be passed to rules associated
      * with the tasks and roles assigned to the user. A param with name 'user' is added to this array,
      * which holds the value of `$userId`.
      * @param Assignment[] $assignments the assignments to the specified user
      * @return array
+     * @internal param string $itemName the name of the operation that need access check
      */
     protected function checkAccessRecursive($user, $item, $params, $assignments)
     {

@@ -9,4 +9,3 @@ out
 gen
 /vendor/
 /composer.lock
-/.php_cs.cache
