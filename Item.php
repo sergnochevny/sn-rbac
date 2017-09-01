@@ -5,8 +5,6 @@
 
 namespace ait\rbac;
 
-use yii\base\BaseObject;
-
 /**
  * Class Item
  * @package ait\rbac
