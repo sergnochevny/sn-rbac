@@ -679,7 +679,10 @@ class DbManager extends BaseManager
     }
 
     /**
-     * @inheritdoc
+     * @param \ait\rbac\Item $parent
+     * @param \ait\rbac\Item $child
+     * @param bool $allow
+     * @return bool
      */
     public function addChild($parent, $child, $allow = true)
     {
@@ -858,8 +861,10 @@ class DbManager extends BaseManager
     }
 
     /**
-     * @inheritdoc
      * @since 2.0.8
+     * @param \ait\rbac\Item $parent
+     * @param \ait\rbac\Item $child
+     * @return bool
      */
     public function canAddChild($parent, $child)
     {
