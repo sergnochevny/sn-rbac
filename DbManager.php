@@ -619,11 +619,12 @@ class DbManager extends BaseManager
             ->andWhere(['a.user_id' => (string)$userId])
             ->andWhere(['b.type' => [Item::TYPE_ROLE, Item::TYPE_CUSTOM_ROLE]]);
 
-        $roles = $this->getDefaultRoleInstances();
+        $roles = [];
         foreach ($query->all($this->db) as $row) {
             $roles[$row['name']] = $this->populateItem($row);
         }
-        return $roles;
+
+        return array_merge($roles, $this->getDefaultRoleInstances());
     }
 
     /**
