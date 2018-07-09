@@ -1,13 +1,13 @@
 <?php
 /**
- * Copyright (c) 2017. AIT
+ * Copyright (c) 2017. sn
  */
 
-namespace ait\rbac;
+namespace sn\rbac;
 
 /**
  * Class CustomRole
- * @package ait\rbac
+ * @package sn\rbac
  */
 class CustomRole extends Item
 {

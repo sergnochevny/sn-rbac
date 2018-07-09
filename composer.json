@@ -1,8 +1,8 @@
 {
-  "name": "ait/rbac",
-  "description": "AIT RBAC",
+  "name": "sn/rbac",
+  "description": "sn RBAC",
   "keywords": [
-    "ait",
+    "sn",
     "yii",
     "yii2",
     "yii 2",
@@ -19,7 +19,7 @@
   },
   "autoload": {
     "psr-4": {
-      "ait\\rbac\\": ""
+      "sn\\rbac\\": ""
     }
   },
   "config": {

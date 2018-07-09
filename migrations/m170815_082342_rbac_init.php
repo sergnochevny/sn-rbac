@@ -1,9 +1,9 @@
 <?php
 /**
- * Copyright (c) 2017. AIT
+ * Copyright (c) 2017. sn
  */
 
-use ait\rbac\DbManager;
+use sn\rbac\DbManager;
 use yii\base\InvalidConfigException;
 use yii\db\Migration;
 

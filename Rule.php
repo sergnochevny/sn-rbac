@@ -1,9 +1,9 @@
 <?php
 /**
- * Copyright (c) 2017. AIT
+ * Copyright (c) 2017. sn
  */
 
-namespace ait\rbac;
+namespace sn\rbac;
 
 /**
  * Rule represents a business constraint that may be associated with a role, permission or assignment.

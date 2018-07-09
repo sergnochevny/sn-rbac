@@ -1,9 +1,9 @@
 <?php
 /**
- * Copyright (c) 2017. AIT
+ * Copyright (c) 2017. sn
  */
 
-namespace ait\rbac;
+namespace sn\rbac;
 
 use yii\base\Component;
 use yii\base\InvalidConfigException;

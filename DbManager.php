@@ -1,9 +1,9 @@
 <?php
 /**
- * Copyright (c) 2017. AIT
+ * Copyright (c) 2017. sn
  */
 
-namespace ait\rbac;
+namespace sn\rbac;
 
 use Yii;
 use yii\base\InvalidCallException;
@@ -22,7 +22,7 @@ use yii\rbac\Assignment;
  * The database connection is specified by [[db]]. The database schema could be initialized by applying migration:
  *
  * ```
- * yii migrate --migrationPath=@ait/rbac/migrations/
+ * yii migrate --migrationPath=@sn/rbac/migrations/
  * ```
  *
  * If you don't want to use migration and need SQL instead, files for all databases are in migrations directory.
@@ -680,8 +680,8 @@ class DbManager extends BaseManager
     }
 
     /**
-     * @param \ait\rbac\Item $parent
-     * @param \ait\rbac\Item $child
+     * @param \sn\rbac\Item $parent
+     * @param \sn\rbac\Item $child
      * @param bool $allow
      * @return bool
      */
@@ -863,8 +863,8 @@ class DbManager extends BaseManager
 
     /**
      * @since 2.0.8
-     * @param \ait\rbac\Item $parent
-     * @param \ait\rbac\Item $child
+     * @param \sn\rbac\Item $parent
+     * @param \sn\rbac\Item $child
      * @return bool
      */
     public function canAddChild($parent, $child)
